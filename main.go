@@ -2,7 +2,9 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"runtime/debug"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -19,10 +21,20 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	defer db.Close()
+
+	q := "SELECT 1"
 	var n int
-	err = db.QueryRow("SELECT 1").Scan(&n)
+	err = db.QueryRow(q).Scan(&n)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Println(n)
+	log.Printf("%q => %v\n", q, n)
+
+	if bi, ok := debug.ReadBuildInfo(); ok {
+		for _, s := range bi.Settings {
+			fmt.Println(s.Key+":", s.Value)
+		}
+	}
+
 }
